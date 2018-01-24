@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		
+		
+		
+		<script>
+			//获取css样式的兼容封装
+			function getStyle(obj,attr){
+				if(getComputedStyle){
+					return getComputedStyle(obj)[attr];
+				}else{
+					return obj.currentStyle[attr];
+				}
+			}
+			
+			
+			
+//缓冲运动的封装思路:1.缓冲运动：离目标越近，速度越小，越远速度越快.
+//					2.首先设置定时器使left,不断变化
+//					3.需要有目标点target,用来停掉计时器，用目标点来计算速度var speed=（target-current）/运动因子（运动因子决定运动快慢）(当前位置的相应属性值)
+//				    4.由于运动初始位置可能在目标点左边，也可能在目标点右边，所以要考虑周全进行封装，由于speed快到目标点，speed<1,在浏览器最小单位1px 才能使元素运动，小于1px,元素相当于0，静止。
+//					注意:如果想使多物体一起进行缓冲运动,就要设置多个计时器,不能共用一个定时器,不然会出问题.可以把timer作为对象的属性obj.timer
+					
+			
+			function move(obj,target,attr){
+				
+				clearInterval(obj.timer);//------------>obj.timer为了给多个物体设置定时器
+				obj.timer=setInterval(function(){
+					var speed;
+					var current;
+					if(attr=="opacity"){
+						current=Math.round(getStyle(obj,attr)*100);
+					}else{
+						current=parseInt(getStyle(obj,attr));
+					}
+					speed=(target-current)/5;
+					speed=speed>0?Math.ceil(speed):Math.floor(speed);
+					if(current==target){
+						clearInterval(obj.timer);
+					}
+					if(attr=="opacity"){
+						obj.style.opacity=(current+speed)/100;
+						obj.style.filter="alpha(opacity="+current+speed+")";
+					}else{
+						obj.style[attr]=current+speed+"px";
+					}
+				
+				},30)
+			}
+//封装透明度时候，style值，不能有px,所以需要判断，attr,另外opacity值始终在0-1内，parseInt之后一直就是1，所以可以先把获得opacity扩大100倍
+		</script>
+		
+		
+		
+		
+		
+	</body>
+</html>
